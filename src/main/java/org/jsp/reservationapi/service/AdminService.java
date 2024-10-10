@@ -41,6 +41,56 @@ public class AdminService {
 		else
 			return null;
 	}
+	public Admin verify(long phone ,String password)
+	{
+		Optional<Admin> dbAdmin= adminDao.verify(phone, password);
+		if(dbAdmin.isPresent())
+		{
+			return dbAdmin.get();
+		}
+		else
+		return	null;
+		
+	}
+	public Admin verify(String email,String password)
+	{
+		Optional<Admin> dbAdmin = adminDao.verify(email, password);
+		if(dbAdmin.isPresent())
+		{
+			return dbAdmin.get();
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public String delete(int id)
+	{
+		Optional<Admin> dbAdmin = adminDao.findById(id);
+		if(dbAdmin.isPresent())
+		{
+			adminDao.delete(id);
+			return "Admin Found";
+		}
+		else
+		{
+			return "Admin not find";
+		}
+	}
 	
    
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
