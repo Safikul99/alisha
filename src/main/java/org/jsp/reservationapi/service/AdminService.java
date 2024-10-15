@@ -3,22 +3,34 @@ package org.jsp.reservationapi.service;
 import java.util.Optional;
 
 import org.jsp.reservationapi.dao.AdminDao;
+import org.jsp.reservationapi.dto.ResponseStructure;
 import org.jsp.reservationapi.model.Admin;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 @Service
 public class AdminService {
 	@Autowired
    private AdminDao adminDao;
-	public Admin saveAdmin(Admin admin)
+	public ResponseEntity<ResponseStructure<Admin>> saveAdmin(Admin admin)
 	{
-	return	adminDao.saveAdmin(admin);
+		ResponseStructure<Admin>structure=new ResponseStructure<>();
+	     structure.setMessage("Admin saved");
+	     structure.setData(adminDao.saveAdmin(admin));
+	     structure.setStatusCode(HttpStatus.CREATED.value());
+	     return ResponseEntity.status(HttpStatus.CREATED).body(structure);
+	     
 	}
-	public Admin update(Admin admin)
+	public ResponseEntity<ResponseStructure<Admin>> update(Admin admin)
 	{
+		
 		Optional<Admin> recAdmin= adminDao.findById(admin.getId());
+		ResponseStructure<Admin>structure=new ResponseStructure<>();
 		if(recAdmin.isPresent())
 		{
+			
 			Admin  dbAdmin= recAdmin.get();
 			dbAdmin.setEmail(admin.getEmail());
 			dbAdmin.setName(admin.getName());
@@ -26,38 +38,54 @@ public class AdminService {
 			dbAdmin.setPassword(admin.getPassword());
 			dbAdmin.setPhone(admin.getPhone());
 			dbAdmin.setTravles_name(admin.getTravles_name());
-			return dbAdmin;
+			structure.setData(adminDao.saveAdmin(admin));
+			structure.setMessage("Admin update");
+			structure.setStatusCode(HttpStatus.ACCEPTED.value());
+			return ResponseEntity.status(HttpStatus.ACCEPTED).body(structure);
 		}
 		else
 			return null;
 	}
-	public Admin findById(int id)
+	public ResponseEntity<ResponseStructure<Admin>> findById(int id)
 	{
-		Optional<Admin> dbAdmin = adminDao.findById(id);
+		ResponseStructure<Admin>structure=new ResponseStructure<>();
+        Optional<Admin> dbAdmin = adminDao.findById(id);
 		if(dbAdmin.isPresent())
 		{
-			return dbAdmin.get();
+			structure.setData(dbAdmin.get());
+			structure.setMessage("Admin found");
+			structure.setStatusCode(HttpStatus.OK.value());
+			return ResponseEntity.status(HttpStatus.OK).body(structure);
 		}
 		else
 			return null;
 	}
-	public Admin verify(long phone ,String password)
+	public ResponseEntity<ResponseStructure<Admin>> verify(long phone ,String password)
 	{
+		ResponseStructure<Admin>structure=new ResponseStructure<>();
 		Optional<Admin> dbAdmin= adminDao.verify(phone, password);
 		if(dbAdmin.isPresent())
 		{
-			return dbAdmin.get();
+			structure.setData(dbAdmin.get());
+			structure.setMessage("Verification Succesfull");
+			structure.setStatusCode(HttpStatus.OK.value());
+			return ResponseEntity.status(HttpStatus.OK).body(structure);
 		}
 		else
 		return	null;
 		
 	}
-	public Admin verify(String email,String password)
+	public ResponseEntity<ResponseStructure<Admin>> verify(String email,String password)
 	{
+		ResponseStructure<Admin>structure=new ResponseStructure<>();
 		Optional<Admin> dbAdmin = adminDao.verify(email, password);
 		if(dbAdmin.isPresent())
 		{
-			return dbAdmin.get();
+			structure.setData(dbAdmin.get());
+			structure.setMessage("Verification succesfull");
+			structure.setStatusCode(HttpStatus.OK.value());
+			
+			return ResponseEntity.status(HttpStatus.OK).body(structure);
 		}
 		else
 		{
@@ -65,17 +93,21 @@ public class AdminService {
 		}
 	}
 	
-	public String delete(int id)
+	public ResponseEntity<ResponseStructure<String>> delete(int id)
 	{
+		ResponseStructure<String>structure=new ResponseStructure<>();
 		Optional<Admin> dbAdmin = adminDao.findById(id);
 		if(dbAdmin.isPresent())
 		{
 			adminDao.delete(id);
-			return "Admin Found";
+			structure.setData("Admin Found");
+			structure.setMessage("Admin delete");
+			structure.setStatusCode(HttpStatus.OK.value());
+			return ResponseEntity.status(HttpStatus.OK).body(structure);
 		}
 		else
 		{
-			return "Admin not find";
+			return null;
 		}
 	}
 	
